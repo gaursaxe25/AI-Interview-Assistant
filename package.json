@@ -1,0 +1,24 @@
+{
+    "name": "ai-interview-assistant",
+    "version": "1.0.0",
+    "description": "AI-powered interview preparation chatbot for software developer roles",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node server.js"
+    },
+    "keywords": [
+        "interview",
+        "ai",
+        "chatbot",
+        "hackathon"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "@google/generative-ai": "^0.21.0",
+        "cors": "^2.8.5",
+        "dotenv": "^17.3.1",
+        "express": "^4.18.2"
+    }
+}
