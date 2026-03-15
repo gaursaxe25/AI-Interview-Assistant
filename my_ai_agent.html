@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Interview Prep Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #f8f8f6;
+            --surface: #ffffff;
+            --surface2: #f2f1ef;
+            --border: rgba(0, 0, 0, 0.1);
+            --border2: rgba(0, 0, 0, 0.18);
+            --text: #1a1a18;
+            --text2: #6b6b67;
+            --text3: #9b9b96;
+            --accent: #1d4ed8;
+            --accent-bg: #dbeafe;
+            --accent-muted: #93c5fd;
+            --success: #15803d;
+            --success-bg: #dcfce7;
+            --warn: #b45309;
+            --warn-bg: #fef3c7;
+            --danger: #b91c1c;
+            --danger-bg: #fee2e2;
+            --radius: 10px;
+            --radius-sm: 7px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #111110;
+                --surface: #1c1c1a;
+                --surface2: #252522;
+                --border: rgba(255, 255, 255, 0.1);
+                --border2: rgba(255, 255, 255, 0.18);
+                --text: #f0f0ec;
+                --text2: #a0a09a;
+                --text3: #6a6a66;
+                --accent: #60a5fa;
+                --accent-bg: #1e3a5f;
+                --accent-muted: #3b82f6;
+                --success: #4ade80;
+                --success-bg: #14532d;
+                --warn: #fbbf24;
+                --warn-bg: #451a03;
+                --danger: #f87171;
+                --danger-bg: #450a0a;
+            }
+        }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 24px 16px 40px;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* ─── TOP WORDMARK ─── */
+        .wordmark {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .wm-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .wm-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .wm-sub {
+            font-size: 12px;
+            color: var(--text2);
+            margin-left: auto;
+        }
+
+        /* ─── PANELS ─── */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        /* ─── SETUP ─── */
+        #setup {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .setup-hero {
+            padding: 24px 24px 20px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--accent-bg) 0%, transparent 60%);
+        }
+
+        .sh-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .sh-sub {
+            font-size: 13px;
+            color: var(--text2);
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        .setup-body {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
+        }
+
+        .opt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .opt {
+            background: var(--surface2);
+            border: 1.5px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 11px 13px;
+            cursor: pointer;
+            transition: all 0.13s;
+            user-select: none;
+        }
+
+        .opt:hover {
+            border-color: var(--border2);
+            background: var(--surface);
+        }
+
+        .opt.sel {
+            border-color: var(--accent);
+            background: var(--accent-bg);
+        }
+
+        .opt.sel .on {
+            color: var(--accent);
+        }
+
+        .on {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .od {
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 1px;
+        }
+
+        .role-input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 13px;
+            font-size: 14px;
+            font-family: 'Syne', sans-serif;
+            color: var(--text);
+            background: var(--surface2);
+            outline: none;
+            transition: border-color 0.13s;
+        }
+
+        .role-input::placeholder {
+            color: var(--text3);
+        }
+
+        .role-input:focus {
+            border-color: var(--accent);
+            background: var(--surface);
+        }
+
+        .start-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 13px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Syne', sans-serif;
+            cursor: pointer;
+            transition: opacity 0.12s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .start-btn:hover {
+            opacity: 0.9;
+        }
+
+        .start-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ─── INTERVIEW ─── */
+        #iv {
+            display: none;
+            flex-direction: column;
+        }
+
+        .iv-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+        }
+
+        .ivh-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .iv-av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-bg);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .iv-nm {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .iv-rl {
+            font-size: 11px;
+            color: var(--text2);
+        }
+
+        .ivh-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 9px;
+            border-radius: 99px;
+        }
+
+        .b-blue {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .b-amber {
+            background: var(--warn-bg);
+            color: var(--warn);
+        }
+
+        .q-ctr {
+            font-size: 11px;
+            color: var(--text2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .msgs-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 340px;
+            max-height: 420px;
+            background: var(--bg);
+        }
+
+        .msg {
+            display: flex;
+            gap: 8px;
+            animation: pop-in 0.2s ease;
+        }
+
+        .msg.user {
+            flex-direction: row-reverse;
+        }
+
+        @keyframes pop-in {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .m-av {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 16px;
+        }
+
+        .m-av.ai {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: transparent;
+        }
+
+        .msg-wrap {
+            max-width: 82%;
+        }
+
+        .m-lbl {
+            font-size: 10px;
+            color: var(--text3);
+            margin-bottom: 3px;
+        }
+
+        .msg.user .m-lbl {
+            text-align: right;
+        }
+
+        .bubble {
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .msg.ai .bubble {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top-left-radius: 3px;
+        }
+
+        .msg.user .bubble {
+            background: var(--accent);
+            color: #fff;
+            border-top-right-radius: 3px;
+        }
+
+        .fb-box {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        .fb-score-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            color: var(--text2);
+            margin-bottom: 4px;
+        }
+
+        .s-pill {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .fb-improve {
+            font-size: 12px;
+            color: var(--text2);
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-muted);
+            animation: bounce 1.2s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0)
+            }
+
+            30% {
+                transform: translateY(-5px)
+            }
+        }
+
+        .iv-footer {
+            padding: 10px 16px 14px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .act-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .act-btn {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 11px;
+            border-radius: 99px;
+            border: 1px solid var(--border2);
+            background: transparent;
+            color: var(--text2);
+            font-family: 'Syne', sans-serif;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .act-btn:hover {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
+        .act-btn.danger:hover {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .inp-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .ans-ta {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 9px 12px;
+            font-size: 13.5px;
+            font-family: 'Syne', sans-serif;
+            color: var(--text);
+            background: var(--surface2);
+            outline: none;
+            resize: none;
+            height: 58px;
+            line-height: 1.5;
+            transition: border-color 0.12s;
+        }
+
+        .ans-ta::placeholder {
+            color: var(--text3);
+        }
+
+        .ans-ta:focus {
+            border-color: var(--accent);
+            background: var(--surface);
+        }
+
+        .ans-ta:disabled {
+            opacity: 0.5;
+        }
+
+        .send-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 0 16px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Syne', sans-serif;
+            cursor: pointer;
+            height: 36px;
+            transition: opacity 0.12s;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            opacity: 0.88;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        /* ─── PROGRESS BAR ─── */
+        .progress-bar {
+            height: 3px;
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.4s ease;
+        }
+
+        /* ─── REPORT ─── */
+        #rpt {
+            display: none;
+            flex-direction: column;
+        }
+
+        .rpt-hero {
+            padding: 22px 24px 18px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--success-bg) 0%, transparent 60%);
+        }
+
+        .rh-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .rh-sub {
+            font-size: 12px;
+            color: var(--text2);
+            margin-top: 3px;
+        }
+
+        .rpt-body {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .score-overview {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+        }
+
+        .big-score {
+            font-size: 52px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .bs-lbl {
+            font-size: 11px;
+            color: var(--text2);
+            margin-top: 4px;
+        }
+
+        .skill-bars {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sb-row {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .sb-meta {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sb-n {
+            font-size: 12px;
+            color: var(--text2);
+        }
+
+        .sb-v {
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+        }
+
+        .track {
+            height: 5px;
+            background: var(--border);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 1s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
+        }
+
+        .imp-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .imp-item {
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            padding: 10px 13px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--text);
+            border-left: 3px solid var(--accent);
+        }
+
+        .rpt-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .rst-btn {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 11px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'Syne', sans-serif;
+            color: var(--text);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.12s;
+        }
+
+        .rst-btn:hover {
+            background: var(--surface);
+            border-color: var(--border2);
+        }
+
+        /* ─── SCROLLBAR ─── */
+        .msgs-area::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .msgs-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .msgs-area::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 99px;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 500px) {
+            body {
+                padding: 12px 8px 30px;
+            }
+
+            .setup-body,
+            .rpt-body {
+                padding: 16px;
+            }
+
+            .setup-hero,
+            .rpt-hero {
+                padding: 18px 16px 14px;
+            }
+
+            .opt-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .score-overview {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-shell">
+
+        <!-- WORDMARK -->
+        <div class="wordmark">
+            <div class="wm-icon">🎯</div>
+            <span class="wm-text">InterviewAI</span>
+            <span class="wm-sub">Powered by Claude</span>
+        </div>
+
+        <!-- ── SETUP PANEL ── -->
+        <div class="panel" id="setup">
+            <div class="setup-hero">
+                <div class="sh-title">Ace your next interview</div>
+                <div class="sh-sub">Simulate real interviews with an AI interviewer. Get instant, detailed feedback and
+                    level up your answers.</div>
+            </div>
+
+            <div class="setup-body">
+
+                <div>
+                    <div class="field-label">Interview type</div>
+                    <div class="opt-grid">
+                        <div class="opt sel" onclick="pick(this,'type','Technical')">
+                            <div class="on">Technical</div>
+                            <div class="od">DSA, algorithms, CS fundamentals</div>
+                        </div>
+                        <div class="opt" onclick="pick(this,'type','HR')">
+                            <div class="on">HR / Behavioural</div>
+                            <div class="od">STAR method, culture fit, soft skills</div>
+                        </div>
+                        <div class="opt" onclick="pick(this,'type','Mixed')">
+                            <div class="on">Mixed Round</div>
+                            <div class="od">Technical + HR combined</div>
+                        </div>
+                        <div class="opt" onclick="pick(this,'type','System Design')">
+                            <div class="on">System Design</div>
+                            <div class="od">Architecture, scalability, trade-offs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="field-label">Difficulty level</div>
+                    <div class="opt-grid">
+                        <div class="opt" onclick="pick(this,'diff','Fresher')">
+                            <div class="on">Fresher</div>
+                            <div class="od">Entry level, campus placements</div>
+                        </div>
+                        <div class="opt sel" onclick="pick(this,'diff','Mid-level')">
+                            <div class="on">Mid-level</div>
+                            <div class="od">2–4 years of experience</div>
+                        </div>
+                        <div class="opt" onclick="pick(this,'diff','Senior')">
+                            <div class="on">Senior</div>
+                            <div class="od">5+ years, leadership</div>
+                        </div>
+                        <div class="opt" onclick="pick(this,'diff','FAANG')">
+                            <div class="on">FAANG / Top-tier</div>
+                            <div class="od">Google, Meta, Amazon, etc.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="field-label">Target role</div>
+                    <input class="role-input" id="role-inp"
+                        placeholder="e.g. Software Engineer, Data Scientist, Product Manager..." />
+                </div>
+
+                <button class="start-btn" onclick="startInterview()">
+                    <span>Start Interview</span>
+                    <span>→</span>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- ── INTERVIEW PANEL ── -->
+        <div class="panel" id="iv">
+            <div class="progress-bar">
+                <div class="progress-fill" id="prog" style="width:0%"></div>
+            </div>
+            <div class="iv-header">
+                <div class="ivh-left">
+                    <div class="iv-av">AI</div>
+                    <div>
+                        <div class="iv-nm">Alex Chen</div>
+                        <div class="iv-rl" id="iv-role">Technical Interviewer</div>
+                    </div>
+                </div>
+                <div class="ivh-right">
+                    <span class="badge b-blue" id="tb-badge"></span>
+                    <span class="badge b-amber" id="db-badge"></span>
+                    <span class="q-ctr" id="q-ctr">Q 0/6</span>
+                </div>
+            </div>
+
+            <div class="msgs-area" id="msgs"></div>
+
+            <div class="iv-footer">
+                <div class="act-row">
+                    <button class="act-btn" onclick="getHint()">💡 Get a hint</button>
+                    <button class="act-btn" onclick="skipQ()">⏭ Skip question</button>
+                    <button class="act-btn danger" onclick="endIV()">🏁 End & see report</button>
+                </div>
+                <div class="inp-row">
+                    <textarea class="ans-ta" id="ans-ta"
+                        placeholder="Type your answer... (Enter to send, Shift+Enter for new line)"></textarea>
+                    <button class="send-btn" id="send-btn" onclick="submitAns()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── REPORT PANEL ── -->
+        <div class="panel" id="rpt">
+            <div class="rpt-hero">
+                <div class="rh-title">Interview Complete ✓</div>
+                <div class="rh-sub" id="r-sub"></div>
+            </div>
+
+            <div class="rpt-body">
+
+                <div class="score-overview">
+                    <div>
+                        <div class="big-score" id="o-score">--</div>
+                        <div class="bs-lbl">Overall score / 100</div>
+                    </div>
+                    <div class="skill-bars" id="skill-bars"></div>
+                </div>
+
+                <div>
+                    <div class="section-title">Areas to improve</div>
+                    <div class="imp-list" id="imp-list"></div>
+                </div>
+
+                <div class="rpt-actions">
+                    <button class="rst-btn" onclick="restart()">↺ New interview</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ── STATE ──
+        let S = {
+            type: 'Technical',
+            diff: 'Mid-level',
+            role: '',
+            qN: 0,
+            maxQ: 6,
+            scores: [],
+            hist: [],
+            loading: false
+        };
+
+        // ── SETUP INTERACTIONS ──
+        function pick(el, grp, val) {
+            document.querySelectorAll(`[onclick*="'${grp}'"]`).forEach(e => e.classList.remove('sel'));
+            el.classList.add('sel');
+            S[grp] = val;
+        }
+
+        function showPanel(id) {
+            ['setup', 'iv', 'rpt'].forEach(p => {
+                const el = document.getElementById(p);
+                el.style.display = 'none';
+            });
+            const t = document.getElementById(id);
+            t.style.display = 'flex';
+            t.style.flexDirection = 'column';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ── CLAUDE API ──
+        async function claude(sys, userMsg, hist = []) {
+            const messages = [...hist, { role: 'user', content: userMsg }];
+            try {
+                const res = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        system: sys,
+                        messages
+                    })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error.message);
+                return data.content?.[0]?.text || '';
+            } catch (err) {
+                return `{"feedback":"Sorry, I ran into a connection issue. Please check your API key and try again.","score":null,"strengths":"","improve":"","next_question":null}`;
+            }
+        }
+
+        // ── SYSTEM PROMPT ──
+        function sysPrompt() {
+            const focus = {
+                'Technical': 'Data structures, algorithms, time/space complexity, coding, CS fundamentals, OOP, databases.',
+                'HR': 'STAR method behavioural questions: leadership, teamwork, conflict resolution, career goals, strengths/weaknesses.',
+                'Mixed': 'Alternate between technical CS questions and STAR behavioural questions each turn.',
+                'System Design': 'Architecture patterns, scalability, load balancing, database sharding, caching, microservices, API design, trade-offs.'
+            }[S.type];
+
+            return `You are Alex Chen, a warm but rigorous senior ${S.type} interviewer at a top-tier tech company. You are interviewing a candidate for the role of "${S.role || 'Software Engineer'}" at ${S.diff} difficulty level.
+
+INTERVIEW FOCUS: ${focus}
+
+STRICT RULES:
+1. Ask EXACTLY ONE question per turn. Never bundle multiple questions.
+2. After the candidate's answer, respond ONLY with valid JSON in this exact format — no extra text before or after:
+{
+  "feedback": "2–3 specific sentences assessing the answer. Reference what they said.",
+  "score": <integer 1-10>,
+  "strengths": "One specific strength in their answer",
+  "improve": "One concrete, actionable improvement suggestion",
+  "next_question": "Your next interview question as a full sentence, or null if this is the last question"
+}
+3. Be constructive and encouraging, but honest. Don't inflate scores.
+4. Tailor question difficulty to ${S.diff} level.
+5. You have ${S.maxQ} questions total to ask.
+
+START: Greet the candidate warmly (1–2 sentences), introduce yourself, and ask your FIRST question. Do NOT use JSON for the opening greeting — just natural text.`;
+        }
+
+        // ── INTERVIEW FLOW ──
+        async function startInterview() {
+            S.role = document.getElementById('role-inp').value.trim() || 'Software Engineer';
+            S.qN = 0; S.scores = []; S.hist = [];
+
+            document.getElementById('iv-role').textContent = S.type + ' Interviewer';
+            document.getElementById('tb-badge').textContent = S.type;
+            document.getElementById('db-badge').textContent = S.diff;
+            document.getElementById('msgs').innerHTML = '';
+            showPanel('iv');
+            updateUI();
+
+            setLoad(true);
+            const greeting = await claude(sysPrompt(), 'Hello, I am ready to begin the interview.');
+            S.hist.push(
+                { role: 'user', content: 'Hello, I am ready to begin the interview.' },
+                { role: 'assistant', content: greeting }
+            );
+            setLoad(false);
+
+            addMsg('ai', greeting, null);
+            S.qN = 1;
+            updateUI();
+        }
+
+        async function submitAns() {
+            if (S.loading) return;
+            const ta = document.getElementById('ans-ta');
+            const ans = ta.value.trim();
+            if (!ans) return;
+
+            ta.value = '';
+            addMsg('user', ans, null);
+            const prevHist = [...S.hist];
+            S.hist.push({ role: 'user', content: ans });
+
+            if (S.qN >= S.maxQ) {
+                endIV();
+                return;
+            }
+
+            setLoad(true);
+            const raw = await claude(sysPrompt(), ans, prevHist);
+            setLoad(false);
+            S.hist.push({ role: 'assistant', content: raw });
+
+            let parsed = null;
+            try {
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) parsed = JSON.parse(m[0]);
+            } catch (e) { }
+
+            if (parsed) {
+                if (parsed.score) S.scores.push(parsed.score);
+                addMsg('ai', '', parsed);
+                S.qN++;
+                updateUI();
+                if (!parsed.next_question || S.qN > S.maxQ) {
+                    setTimeout(() => endIV(), 1200);
+                }
+            } else {
+                addMsg('ai', raw, null);
+                S.qN++;
+                updateUI();
+            }
+        }
+
+        async function getHint() {
+            if (S.loading) return;
+            setLoad(true);
+            const raw = await claude(
+                sysPrompt() + '\n\nSpecial: The candidate asked for a hint. Give a SHORT (1-2 sentence) hint that nudges them in the right direction without giving the full answer. Respond in plain text, NOT JSON.',
+                'Can you give me a hint for this question?',
+                S.hist
+            );
+            setLoad(false);
+
+            let hint = raw;
+            try {
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) { const p = JSON.parse(m[0]); hint = p.feedback || p.next_question || raw; }
+            } catch (e) { }
+
+            addMsg('ai', '💡 Hint: ' + hint, null);
+            S.hist.push(
+                { role: 'user', content: 'Can you give me a hint?' },
+                { role: 'assistant', content: raw }
+            );
+        }
+
+        async function skipQ() {
+            if (S.loading) return;
+            setLoad(true);
+            const raw = await claude(
+                sysPrompt() + '\n\nSpecial: The candidate chose to skip this question. Acknowledge it briefly (1 sentence) and immediately ask your next interview question. Respond in plain text, NOT JSON.',
+                'I would like to skip this question and move to the next one.',
+                S.hist
+            );
+            setLoad(false);
+
+            let txt = raw;
+            try {
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) { const p = JSON.parse(m[0]); txt = p.next_question || p.feedback || raw; }
+            } catch (e) { }
+
+            S.scores.push(4);
+            S.qN++;
+            updateUI();
+            addMsg('ai', txt, null);
+            S.hist.push(
+                { role: 'user', content: 'Skip this question' },
+                { role: 'assistant', content: raw }
+            );
+        }
+
+        async function endIV() {
+            if (S.loading) return;
+            setLoad(true);
+
+            const avg = S.scores.length ? Math.round(S.scores.reduce((a, b) => a + b, 0) / S.scores.length * 10) : 65;
+            const raw = await claude(
+                `You are a senior interviewer writing a post-interview evaluation. Be honest and constructive.
+Return ONLY valid JSON, no extra text:
+{
+  "overall": <integer 0-100>,
+  "technical": <integer 0-100>,
+  "communication": <integer 0-100>,
+  "confidence": <integer 0-100>,
+  "improvements": [
+    "Specific improvement 1 with actionable advice",
+    "Specific improvement 2 with actionable advice",
+    "Specific improvement 3 with actionable advice"
+  ]
+}`,
+                `Evaluate this ${S.type} interview for the role of "${S.role}" at ${S.diff} level.
+Per-question scores (out of 10): ${JSON.stringify(S.scores)}.
+Average score implied: ~${avg}/100.
+Total questions answered: ${S.scores.length}.
+Derive your scores from the question scores and the conversation context.`,
+                S.hist
+            );
+            setLoad(false);
+
+            let rep = {
+                overall: avg,
+                technical: Math.round(avg * 0.95),
+                communication: Math.round(avg * 1.05),
+                confidence: Math.round(avg * 0.9),
+                improvements: [
+                    'Practice explaining your thought process out loud before writing code.',
+                    'Use the STAR method to structure behavioural answers more clearly.',
+                    'Ask clarifying questions to show you understand the problem space.'
+                ]
+            };
+
+            try {
+                const m = raw.match(/\{[\s\S]*\}/);
+                if (m) rep = JSON.parse(m[0]);
+            } catch (e) { }
+
+            renderReport(rep);
+        }
+
+        // ── RENDER HELPERS ──
+        function addMsg(who, text, fb) {
+            const area = document.getElementById('msgs');
+            const wrap = document.createElement('div');
+            wrap.className = 'msg ' + who;
+
+            let displayText = text;
+            if (fb) {
+                displayText = fb.feedback || '';
+                if (fb.next_question) displayText += `<br><br><strong>${fb.next_question}</strong>`;
+            }
+
+            let fbHtml = '';
+            if (fb && fb.score) {
+                const s = fb.score;
+                const col = s >= 8 ? 'var(--success)' : s >= 6 ? 'var(--warn)' : 'var(--danger)';
+                const bg = s >= 8 ? 'var(--success-bg)' : s >= 6 ? 'var(--warn-bg)' : 'var(--danger-bg)';
+                fbHtml = `<div class="fb-box">
+      <div class="fb-score-row">
+        <span class="s-pill" style="background:${bg};color:${col}">${s}/10</span>
+        <span>✓ ${fb.strengths || ''}</span>
+      </div>
+      <div class="fb-improve">→ ${fb.improve || ''}</div>
+    </div>`;
+            }
+
+            const initials = who === 'ai' ? 'AI' : 'You';
+            const name = who === 'ai' ? 'Alex Chen' : 'You';
+
+            wrap.innerHTML = `
+    <div class="m-av ${who === 'ai' ? 'ai' : ''}">${initials}</div>
+    <div class="msg-wrap">
+      <div class="m-lbl">${name}</div>
+      <div class="bubble">${displayText}${fbHtml}</div>
+    </div>`;
+
+            area.appendChild(wrap);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function addTyping() {
+            const area = document.getElementById('msgs');
+            const el = document.createElement('div');
+            el.className = 'msg ai'; el.id = 'typing-msg';
+            el.innerHTML = `
+    <div class="m-av ai">AI</div>
+    <div class="msg-wrap">
+      <div class="m-lbl">Alex Chen</div>
+      <div class="bubble"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    </div>`;
+            area.appendChild(el);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function rmTyping() {
+            const el = document.getElementById('typing-msg');
+            if (el) el.remove();
+        }
+
+        function setLoad(v) {
+            S.loading = v;
+            const sb = document.getElementById('send-btn');
+            const ta = document.getElementById('ans-ta');
+            if (sb) sb.disabled = v;
+            if (ta) ta.disabled = v;
+            if (v) addTyping(); else rmTyping();
+        }
+
+        function updateUI() {
+            const prog = Math.round((S.qN / S.maxQ) * 100);
+            const pEl = document.getElementById('prog');
+            if (pEl) pEl.style.width = Math.min(prog, 100) + '%';
+            const qEl = document.getElementById('q-ctr');
+            if (qEl) qEl.textContent = `Q ${Math.min(S.qN, S.maxQ)}/${S.maxQ}`;
+        }
+
+        function renderReport(r) {
+            document.getElementById('r-sub').textContent = `${S.type} · ${S.diff} · ${S.role}`;
+            document.getElementById('o-score').textContent = r.overall;
+
+            const skills = [
+                { n: 'Technical', v: r.technical },
+                { n: 'Communication', v: r.communication },
+                { n: 'Confidence', v: r.confidence }
+            ];
+
+            document.getElementById('skill-bars').innerHTML = skills.map(sk => {
+                const col = sk.v >= 75 ? 'var(--success)' : sk.v >= 50 ? 'var(--warn)' : 'var(--danger)';
+                return `<div class="sb-row">
+      <div class="sb-meta"><span class="sb-n">${sk.n}</span><span class="sb-v">${sk.v}/100</span></div>
+      <div class="track"><div class="fill" style="width:${sk.v}%;background:${col}"></div></div>
+    </div>`;
+            }).join('');
+
+            document.getElementById('imp-list').innerHTML = (r.improvements || [])
+                .map(i => `<div class="imp-item">${i}</div>`).join('');
+
+            showPanel('rpt');
+        }
+
+        function restart() {
+            S = { type: 'Technical', diff: 'Mid-level', role: '', qN: 0, maxQ: 6, scores: [], hist: [], loading: false };
+            document.querySelectorAll('.opt').forEach(e => e.classList.remove('sel'));
+            document.querySelector('[onclick*="\'type\'"][onclick*="Technical"]').classList.add('sel');
+            document.querySelector('[onclick*="\'diff\'"][onclick*="Mid-level"]').classList.add('sel');
+            document.getElementById('role-inp').value = '';
+            showPanel('setup');
+        }
+
+        // ── KEYBOARD SHORTCUT ──
+        document.addEventListener('keydown', e => {
+            const ta = document.getElementById('ans-ta');
+            if (ta && document.activeElement === ta && e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitAns();
+            }
+        });
+
+        // ── INIT ──
+        showPanel('setup');
+    </script>
+</body>
+
+</html>
